@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather & News Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: lab(81.88% -80.78 77.38 / 0.921);
+    }
+    h2 {
+      color: hsl(0, 92%, 48%);
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    .card {
+      background: #d0086c;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="section" id="weather">
+    <h2>🌦 Weather in Your City</h2>
+    <input type="text" id="cityInput" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="weatherResult" class="card"></div>
+  </div>
+
+  <div class="section" id="news">
+    <h2>📰 Latest News Headlines</h2>
+    <div id="newsList"></div>
+  </div>
+
+  <script>
+    const weatherApiKey = "YOUR_OPENWEATHER_API_KEY";
+    const newsApiKey = "YOUR_NEWSAPI_KEY";
+
+    async function getWeather() {
+      const city = document.getElementById('cityInput').value || "Delhi";
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}&units=metric`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        document.getElementById('weatherResult').innerHTML = `
+          <strong>${data.name}</strong><br>
+          Temp: ${data.main.temp}°C<br>
+          Weather: ${data.weather[0].description}
+        `;
+      } catch (error) {
+        document.getElementById('weatherResult').innerHTML = "Error fetching weather.";
+      }
+    }
+
+    async function getNews() {
+      const url = `https://newsapi.org/v2/top-headlines?country=in&apiKey=${newsApiKey}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const newsList = data.articles.slice(0, 5).map(article => `
+          <div class="card">
+            <strong>${article.title}</strong><br>
+            <small>${article.source.name}</small>
+          </div>
+        `).join("");
+        document.getElementById('newsList').innerHTML = newsList;
+      } catch (error) {
+        document.getElementById('newsList').innerHTML = "Error fetching news.";
+      }
+    }
+
+    // Fetch news on page load
+    getNews();
+  </script>
+
+</body>
+</html>
